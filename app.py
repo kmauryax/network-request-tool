@@ -1,24 +1,28 @@
 import streamlit as st
-#import pyperclip
+import pyperclip
 import streamlit.components.v1 as components
 
+
+# -------------------------- CSS ------------------------
+
+st.markdown("""
+<style>
+/* Generate Button */
+.stButton button {
+    background-color: #03a9f4;
+    color: white;
+    border-radius: 6px;
+    height: 42px;
+    width: 100%;
+    font-weight: 500;
+}
+.stButton button:hover {
+    background-color: #0288d1;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ---------- Functions -----------------------------------
-
-def copy_button(text):
-    copy_script = f"""
-    <textarea id="copyText" style="position:absolute; left:-9999px;">{text}</textarea>
-    <button onclick="
-        var copyText = document.getElementById('copyText');
-        copyText.select();
-        document.execCommand('copy');
-        alert('Copied to clipboard!');
-    ">
-    📋 Copy to Clipboard
-    </button>
-    """
-    components.html(copy_script, height=50)
-
-# -----------------------------------------------------------
 
 def get_location(env):
     if env in ["dev", "prod", "qa"]:
@@ -137,15 +141,26 @@ if st.button("Generate"):
         if not superzone or not vertical or not project or not env:
             st.error("All inputs are required")
         else:
-            result = generate_output(superzone.lower(), vertical.lower(), project.lower(), env.lower(), include_vertical)
-
-            st.text_area("Output", result, height=400)
-
-            # if st.button("Copy to Clipboard"):
-            #     pyperclip.copy(result)
-            #     st.success("✅ Copied to clipboard!")
-
-            copy_button(result)
-
+            st.session_state.result = generate_output(
+                superzone.lower(),
+                vertical.lower(),
+                project.lower(),
+                env.lower(),
+                include_vertical
+            )
     except Exception as e:
         st.error(str(e))
+
+
+if "result" in st.session_state:
+
+    with st.container():
+        st.markdown("### Output")
+        st.code(st.session_state.result, language="text")
+
+    st.download_button(
+        label="⬇️ Download Output",
+        data=st.session_state.result,
+        file_name="network_request.txt",
+        mime="text/plain"
+    )
