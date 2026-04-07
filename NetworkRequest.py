@@ -1,5 +1,5 @@
 def get_location(env):
-    if env in ["dev", "prod", "qa"]:
+    if env in ["dev", "prod", "qa", "dev2"]:
         return ("westus2", "Washington")
     elif env in ["m1", "m2", "m3", "m4", "m5", "m6", "m7", "dev1"]:
         return ("westus", "NorCal")
